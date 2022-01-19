@@ -3,6 +3,12 @@ import torch
 import torch.nn as nn
 
 from parameters import Parameters
+
+if torch.cuda.is_available():
+    device = 'gpu:0'
+else:
+    device = 'cpu'
+
 parameters = Parameters()
 
 #parameters
@@ -75,12 +81,12 @@ class ActorCritic(nn.Module):
     def move(self, inp):
         torch_in = torch.nan_to_num(torch.from_numpy(inp.astype('float'))).float()
         if not self.training:
-            return self.actor.forward(torch_in).detach().numpy()
+            return self.actor.forward(torch_in.to(device)).detach().numpy()
         else:
-            return self.actor.forward(torch_in)
+            return self.actor.forward(torch_in.to(device))
 
     def value(self, x):
-        return self.critic.forward(torch.nan_to_num(torch.from_numpy(x.astype('float'))).float())
+        return self.critic.forward(torch.nan_to_num(torch.from_numpy(x.astype('float')).to(device)).float())
 
 class Memory:
     def __init__(self):

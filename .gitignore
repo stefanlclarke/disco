@@ -2,3 +2,5 @@ __pycache__/
 disco_venv/
 ac_models/
 bots/__pycache__
+*.DS_Store
+.ipynb_checkpoints/

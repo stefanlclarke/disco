@@ -8,6 +8,10 @@ import copy
 from torch.distributions import Bernoulli
 from parameters import Parameters, load_parameters
 
+if torch.cuda.is_available():
+    device = 'gpu:0'
+else:
+    device = 'cpu'
 
 parameters = Parameters()
 
@@ -18,7 +22,7 @@ epochs = parameters.epochs
 save_freq = parameters.save_freq
 
 #import and prepare bots here:
-ac = ActorCritic(number_of_players)
+ac = ActorCritic(number_of_players).to(device)
 #ac.load_state_dict(torch.load('./ac_models/10jan_6_9350'))
 ac.train_mode()
 
@@ -56,7 +60,7 @@ class SinglePlayerTrainer:
         while running:
             state = self.game.return_state()
             command = self.ac.move(state)
-            command_numpy = np.concatenate([command.detach().numpy()])
+            command_numpy = np.concatenate([command.cpu().detach().numpy()])
             command_oh = np.zeros(4)
             for i in range(4):
                 try:
@@ -89,11 +93,11 @@ class SinglePlayerTrainer:
             Qval = Qval_new
         Qvals = np.array(Qvals)
 
-        log_probs1 = torch.cat([(torch.log(self.memory.actions[i])*torch.from_numpy(self.memory.oh_actions[i])).sum().unsqueeze(0) for i in range(len(self.memory.actions))])
-        log_probs2 = torch.cat([(torch.log(1 - self.memory.actions[i])*(torch.from_numpy(1-self.memory.oh_actions[i]))).sum().unsqueeze(0) for i in range(len(self.memory.actions))])
+        log_probs1 = torch.cat([(torch.log(self.memory.actions[i])*(torch.from_numpy(self.memory.oh_actions[i])).sum().unsqueeze(0).to(device)) for i in range(len(self.memory.actions))])
+        log_probs2 = torch.cat([(torch.log(1 - self.memory.actions[i])*(torch.from_numpy(1-self.memory.oh_actions[i])).to(device)).sum().unsqueeze(0) for i in range(len(self.memory.actions))])
 
         log_probs = log_probs1 + log_probs2
-        advantage = torch.from_numpy(Qvals) - torch.cat(self.memory.critic_memory)
+        advantage = torch.from_numpy(Qvals).to(device) - torch.cat(self.memory.critic_memory)
         #log_probs = torch.cat([torch.unsqueeze(log_prob, 0) for log_prob in log_probs])
         entropy = -torch.stack([torch.stack([torch.minimum(Bernoulli(action[i]).entropy(), torch.tensor(0.3)) for action in self.memory.actions]).sum() for i in range(4)]).sum()
         detached_advantage = advantage.detach()
@@ -117,7 +121,7 @@ class SinglePlayerTrainer:
             actor_loss = - (log_probs * detached_advantage).mean()
             critic_loss = 0.5 * advantage.pow(2).mean()
 
-        ac_loss = self.entropy_constant * entropy + (self.actor_constant * actor_loss + critic_loss)
+        ac_loss = self.entropy_constant * entropy.to(device) + (self.actor_constant * actor_loss + critic_loss)
         ac_loss.backward(retain_graph=False)
 
         nn.utils.clip_grad_norm_(self.ac.parameters(), self.max_grad_norm)

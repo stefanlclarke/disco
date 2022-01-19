@@ -9,7 +9,7 @@ from torch.distributions import Bernoulli
 from parameters import Parameters, load_parameters
 
 if torch.cuda.is_available():
-    device = 'gpu:0'
+    device = 'cuda'
 else:
     device = 'cpu'
 
@@ -93,8 +93,12 @@ class SinglePlayerTrainer:
             Qval = Qval_new
         Qvals = np.array(Qvals)
 
-        log_probs1 = torch.cat([(torch.log(self.memory.actions[i])*(torch.from_numpy(self.memory.oh_actions[i])).sum().unsqueeze(0).to(device)) for i in range(len(self.memory.actions))])
-        log_probs2 = torch.cat([(torch.log(1 - self.memory.actions[i])*(torch.from_numpy(1-self.memory.oh_actions[i])).to(device)).sum().unsqueeze(0) for i in range(len(self.memory.actions))])
+        #log_probs1 = torch.cat([(torch.log(self.memory.actions[i])*(torch.from_numpy(self.memory.oh_actions[i])).to(device).sum().unsqueeze(0)) for i in range(len(self.memory.actions))])
+        #log_probs2 = torch.cat([(torch.log(1 - self.memory.actions[i])*(torch.from_numpy(1-self.memory.oh_actions[i])).to(device)).sum().unsqueeze(0) for i in range(len(self.memory.actions))])
+
+        log_probs1 = torch.cat([((torch.log(self.memory.actions[i])*(torch.from_numpy(self.memory.oh_actions[i]))).sum().unsqueeze(0)) for i in range(len(self.memory.actions))])
+        log_probs2 = torch.cat([((torch.log(self.memory.actions[i])*(torch.from_numpy(self.memory.oh_actions[i]))).sum().unsqueeze(0)) for i in range(len(self.memory.actions))])
+
 
         log_probs = log_probs1 + log_probs2
         advantage = torch.from_numpy(Qvals).to(device) - torch.cat(self.memory.critic_memory)

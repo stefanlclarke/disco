@@ -107,8 +107,8 @@ class SinglePlayerTrainer:
         detached_advantage = advantage.detach()
 
         if self.eligibility_trace:
-            elig_traces_actor = torch.zeros(len(log_probs))
-            elig_traces_critic = torch.zeros(len(log_probs))
+            elig_traces_actor = torch.zeros(len(log_probs)).to(device)
+            elig_traces_critic = torch.zeros(len(log_probs)).to(device)
             elig_trace_actor = 0
             elig_trace_critic = 0
 
@@ -118,11 +118,11 @@ class SinglePlayerTrainer:
                 elig_trace_critic = self.gamma * self.lambda_critic * elig_trace_critic + self.memory.critic_memory[i]
                 elig_traces_critic[i] = elig_trace_critic
 
-            actor_loss = - (elig_traces_actor * detached_advantage.to(device)).mean()
+            actor_loss = - (elig_traces_actor * (detached_advantage.to(device))).mean()
             critic_loss = (0.5 * advantage.pow(2)).mean() #* elig_traces_critic).mean()
 
         else:
-            actor_loss = - (log_probs * detached_advantageto(device)).mean()
+            actor_loss = - (log_probs * detached_advantage.to(device)).mean()
             critic_loss = 0.5 * advantage.pow(2).mean()
 
         ac_loss = self.entropy_constant * entropy.to(device) + (self.actor_constant * actor_loss + critic_loss)

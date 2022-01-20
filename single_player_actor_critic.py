@@ -96,8 +96,8 @@ class SinglePlayerTrainer:
         #log_probs1 = torch.cat([(torch.log(self.memory.actions[i])*(torch.from_numpy(self.memory.oh_actions[i])).to(device).sum().unsqueeze(0)) for i in range(len(self.memory.actions))])
         #log_probs2 = torch.cat([(torch.log(1 - self.memory.actions[i])*(torch.from_numpy(1-self.memory.oh_actions[i])).to(device)).sum().unsqueeze(0) for i in range(len(self.memory.actions))])
 
-        log_probs1 = torch.cat([((torch.log(self.memory.actions[i])*(torch.from_numpy(self.memory.oh_actions[i]))).sum().unsqueeze(0)) for i in range(len(self.memory.actions))])
-        log_probs2 = torch.cat([((torch.log(self.memory.actions[i])*(torch.from_numpy(self.memory.oh_actions[i]))).sum().unsqueeze(0)) for i in range(len(self.memory.actions))])
+        log_probs1 = torch.cat([((torch.log(self.memory.actions[i])*(torch.from_numpy(self.memory.oh_actions[i]).to(device))).sum().unsqueeze(0)) for i in range(len(self.memory.actions))])
+        log_probs2 = torch.cat([((torch.log(1 - self.memory.actions[i])*(torch.from_numpy(1 - self.memory.oh_actions[i]).to(device))).sum().unsqueeze(0)) for i in range(len(self.memory.actions))])
 
 
         log_probs = log_probs1 + log_probs2

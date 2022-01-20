@@ -118,11 +118,11 @@ class SinglePlayerTrainer:
                 elig_trace_critic = self.gamma * self.lambda_critic * elig_trace_critic + self.memory.critic_memory[i]
                 elig_traces_critic[i] = elig_trace_critic
 
-            actor_loss = - (elig_traces_actor * detached_advantage).mean()
+            actor_loss = - (elig_traces_actor * detached_advantage.to(device)).mean()
             critic_loss = (0.5 * advantage.pow(2)).mean() #* elig_traces_critic).mean()
 
         else:
-            actor_loss = - (log_probs * detached_advantage).mean()
+            actor_loss = - (log_probs * detached_advantageto(device)).mean()
             critic_loss = 0.5 * advantage.pow(2).mean()
 
         ac_loss = self.entropy_constant * entropy.to(device) + (self.actor_constant * actor_loss + critic_loss)

@@ -5,7 +5,7 @@ import torch.nn as nn
 from parameters import Parameters
 
 if torch.cuda.is_available():
-    device = 'gpu:0'
+    device = 'cuda'
 else:
     device = 'cpu'
 

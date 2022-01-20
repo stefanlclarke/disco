@@ -9,7 +9,7 @@ from torch.distributions import Bernoulli
 from parameters import Parameters, load_parameters
 
 if torch.cuda.is_available():
-    device = 'cuda'
+    device = 'cuda:0'
 else:
     device = 'cpu'
 

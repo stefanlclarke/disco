@@ -6,7 +6,7 @@ player_size = 10
 friction = 0.1
 move_multiplier = 40
 grid_size = 600
-number_of_squares = 2
+number_of_squares = 4
 time_square_on = 6000
 time_between_squares = 0
 collision_constant = 10
@@ -14,24 +14,24 @@ wall_collision_constant = 0.5
 number_of_players = 1
 
 #neural network parameters
-actor_num_hidden = 1
-actor_size_hidden = 30
-critic_num_hidden = 1
-critic_size_hidden = 30
+actor_num_hidden = 3
+actor_size_hidden = 256
+critic_num_hidden = 3
+critic_size_hidden = 256
 exp_constant = 0.05
 
 #training parameters
 number_of_rounds = 20
 frame_rate = 3
 rounds_per_batch = 1
-gamma = 0.99
+gamma = 0.95
 learning_rate = 0.0004
 max_grad_norm = 1.
 entropy_constant = 0.1
 actor_constant = 1.
 epochs = 100000
-eligibility_trace = True
-lambda_actor = 0.9
+eligibility_trace = False
+lambda_actor = 0.
 lambda_critic = 0.
 
 #saving parameters

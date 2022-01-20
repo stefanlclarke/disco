@@ -20,7 +20,7 @@ from bots.random_bot import RandomAgent
 bot1 = RandomAgent(decision_rate=parameters.frame_rate)
 bot2 = RandomAgent(decision_rate=parameters.frame_rate)
 ac = ActorCritic(1)
-ac.load_state_dict(torch.load('./ac_models/11jan_100000'))
+ac.load_state_dict(torch.load('./ac_models/19jan_ET_41500', map_location=torch.device('cpu')))
 
 ac.train_mode()
 

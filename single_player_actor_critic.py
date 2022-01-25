@@ -126,6 +126,8 @@ class SinglePlayerTrainer:
             critic_loss = 0.5 * advantage.pow(2).mean()
 
         ac_loss = self.entropy_constant * entropy.to(device) + (self.actor_constant * actor_loss + critic_loss)
+
+        self.optimizer.zero_grad()
         ac_loss.backward(retain_graph=False)
 
         nn.utils.clip_grad_norm_(self.ac.parameters(), self.max_grad_norm)
@@ -175,5 +177,5 @@ class SinglePlayerTrainer:
 
 
 trainer = SinglePlayerTrainer(ac)
-trainer.train(epochs, save_freq, '12jan_ET_')
+trainer.train(epochs, save_freq, '14Jan_')
 #print(trainer.memory.states)
